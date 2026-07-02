@@ -59,11 +59,17 @@ with st.sidebar:
 
     # Model switcher
     st.markdown("### 🔄 AI Model")
+    _model_options = ["gemini", "groq", "nvidia_nim"]
+    _model_labels = {
+        "gemini": "✨ Gemini 2.0 Flash",
+        "groq": "🚀 Groq Llama 3.3 70B",
+        "nvidia_nim": "🟢 NVIDIA NIM Llama 3.1 70B",
+    }
     model_choice = st.radio(
         "Select Model",
-        options=["gemini", "groq"],
-        format_func=lambda x: "✨ Gemini 2.0 Flash" if x == "gemini" else "🚀 Groq Llama 3.3 70B",
-        index=0 if st.session_state.model_key == "gemini" else 1,
+        options=_model_options,
+        format_func=lambda x: _model_labels[x],
+        index=_model_options.index(st.session_state.model_key) if st.session_state.model_key in _model_options else 0,
         key="model_radio",
     )
     st.session_state.model_key = model_choice

@@ -31,6 +31,12 @@ MODELS = {
         "provider": "Groq",
         "icon": "🚀",
     },
+    "nvidia_nim": {
+        "name": "nvidia_nim/meta/llama-3.1-70b-instruct",
+        "display": "Llama 3.1 70B (NVIDIA NIM) 🟢",
+        "provider": "NVIDIA",
+        "icon": "🟢",
+    },
 }
 
 DEFAULT_MODEL = "gemini"
@@ -46,6 +52,8 @@ def _ensure_keys():
                 os.environ["GEMINI_API_KEY"] = st.secrets["GEMINI_API_KEY"]
             if "GROQ_API_KEY" in st.secrets:
                 os.environ["GROQ_API_KEY"] = st.secrets["GROQ_API_KEY"]
+            if "NVIDIA_NIM_API_KEY" in st.secrets:
+                os.environ["NVIDIA_NIM_API_KEY"] = st.secrets["NVIDIA_NIM_API_KEY"]
     except Exception:
         pass
 
@@ -56,6 +64,7 @@ def check_api_keys():
     return {
         "gemini": bool(os.environ.get("GEMINI_API_KEY")),
         "groq": bool(os.environ.get("GROQ_API_KEY")),
+        "nvidia_nim": bool(os.environ.get("NVIDIA_NIM_API_KEY")),
     }
 
 
