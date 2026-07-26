@@ -80,6 +80,10 @@ html, body, [data-testid="stAppViewContainer"] {
     background: var(--bg-primary) !important;
 }
 
+[data-testid="stHeader"] {
+    background: var(--bg-primary) !important;
+}
+
 /* ---------- Sidebar ---------- */
 [data-testid="stSidebar"] {
     background: var(--sidebar-bg) !important;
