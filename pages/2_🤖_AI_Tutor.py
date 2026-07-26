@@ -1,6 +1,6 @@
 """
 🤖 AI Tutor — Chat with DP_Bot
-GenZ energy + Alakh Pandey vibes. LiteLLM switches between Gemini & Groq.
+GenZ energy + IShowSpeed vibes. LiteLLM switches between Gemini & Groq.
 """
 
 import streamlit as st

@@ -117,12 +117,12 @@ def _tts_edge(text: str) -> tuple:
         if not clean_text or len(clean_text) < 3:
             clean_text = "Nothing to say here."
 
-        # Use a natural, energetic male voice that matches the tutor persona
-        # en-US-GuyNeural: Natural, warm, friendly male voice
-        voice = "en-US-GuyNeural"
+        # Use a chaotic, hyper energetic voice for IShowSpeed persona
+        # en-US-RogerNeural: Lively male voice, sped up for maximum hype
+        voice = "en-US-RogerNeural"
 
         async def generate():
-            communicate = edge_tts.Communicate(clean_text, voice, rate="+5%", pitch="+2Hz")
+            communicate = edge_tts.Communicate(clean_text, voice, rate="+25%", pitch="+15Hz")
             audio_buffer = io.BytesIO()
             async for chunk in communicate.stream():
                 if chunk["type"] == "audio":
