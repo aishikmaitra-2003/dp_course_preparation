@@ -62,6 +62,10 @@ def inject_theme_css():
     if is_light:
         st.markdown("""<style>
         [data-testid="stAppViewContainer"] { background: #f8fafc !important; }
+    [data-testid="stHeader"] { background: #f8fafc !important; }
+    [data-testid="stBottomBlockContainer"], [data-testid="stBottom"] { background: #f8fafc !important; }
+    [data-testid="stHeader"] { background: #f8fafc !important; }
+    [data-testid="stBottomBlockContainer"], [data-testid="stBottom"] { background: #f8fafc !important; }
         [data-testid="stSidebar"] { background: linear-gradient(180deg, #f1f5f9 0%, #e2e8f0 100%) !important; border-right: 1px solid rgba(0,0,0,0.08) !important; }
         [data-testid="stSidebar"] .stMarkdown h1,
         [data-testid="stSidebar"] .stMarkdown h3 { color: #1e293b !important; -webkit-text-fill-color: #1e293b !important; background: none !important; }
