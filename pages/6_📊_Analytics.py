@@ -23,6 +23,29 @@ if os.path.exists(css_path):
     with open(css_path, encoding="utf-8") as f:
         st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 
+# Theme support
+if "theme" not in st.session_state:
+    st.session_state.theme = "dark"
+is_light = st.session_state.theme == "light"
+text_primary = "#1e293b" if is_light else "#e2e8f0"
+text_secondary = "#475569" if is_light else "#94a3b8"
+text_muted = "#94a3b8" if is_light else "#64748b"
+bg_card = "rgba(255,255,255,0.85)" if is_light else "rgba(30,30,70,0.6)"
+border_color = "rgba(0,0,0,0.08)" if is_light else "rgba(255,255,255,0.1)"
+plot_bg = "rgba(255,255,255,0)" if is_light else "rgba(0,0,0,0)"
+plot_grid = "rgba(0,0,0,0.05)" if is_light else "rgba(255,255,255,0.05)"
+plot_font_color = "#475569" if is_light else "#94a3b8"
+
+if is_light:
+    st.markdown("""<style>
+    [data-testid="stAppViewContainer"] { background: #f8fafc !important; }
+    [data-testid="stSidebar"] { background: linear-gradient(180deg, #f1f5f9 0%, #e2e8f0 100%) !important; }
+    .stMarkdown h1, .stMarkdown h2, .stMarkdown h3 { color: #1e293b !important; }
+    .stMarkdown p, .stCaption p { color: #475569 !important; }
+    [data-testid="stMetric"] { background: rgba(255,255,255,0.85) !important; border: 1px solid rgba(0,0,0,0.08) !important; }
+    [data-testid="stMetricLabel"] { color: #475569 !important; }
+    </style>""", unsafe_allow_html=True)
+
 st.markdown(
     """<h1 style='background: linear-gradient(135deg, #2563eb, #06b6d4);
     -webkit-background-clip: text; -webkit-text-fill-color: transparent;
@@ -55,8 +78,8 @@ col1, col2, col3, col4 = st.columns(4)
 with col1:
     st.metric("🎯 Modules Completed", f"{summary.get('modules_completed', 0)}/10")
 with col2:
-    t = summary.get("total_time_mins", 0)
-    st.metric("⏱️ Total Study Time", f"{t // 60}h {t % 60}m")
+    t_time = summary.get("total_time_mins", 0)
+    st.metric("⏱️ Total Study Time", f"{t_time // 60}h {t_time % 60}m")
 with col3:
     st.metric("📝 Avg Quiz Score", f"{summary.get('avg_quiz_score', 0)}%")
 with col4:
@@ -87,11 +110,11 @@ st.markdown(
     f"""<div style='text-align: center; padding: 1.5rem;
     background: linear-gradient(135deg, {readiness_color}10, {readiness_color}05);
     border: 1px solid {readiness_color}30; border-radius: 16px; margin-bottom: 1.5rem;'>
-    <div style='color: #94a3b8; font-weight: 600; text-transform: uppercase; font-size: 0.8rem;'>
+    <div style='color: {text_secondary}; font-weight: 600; text-transform: uppercase; font-size: 0.8rem;'>
     Exam Readiness Score</div>
     <div style='font-size: 3.5rem; font-weight: 800; color: {readiness_color};
     margin: 0.5rem 0;'>{readiness}%</div>
-    <div style='color: #94a3b8;'>{readiness_msg}</div></div>""",
+    <div style='color: {text_secondary};'>{readiness_msg}</div></div>""",
     unsafe_allow_html=True,
 )
 
@@ -124,11 +147,11 @@ with chart1:
         fig.add_hline(y=70, line_dash="dash", line_color="#10b981", opacity=0.5,
                       annotation_text="Passing: 70%")
         fig.update_layout(
-            plot_bgcolor="rgba(0,0,0,0)",
-            paper_bgcolor="rgba(0,0,0,0)",
-            font=dict(color="#94a3b8"),
+            plot_bgcolor=plot_bg,
+            paper_bgcolor=plot_bg,
+            font=dict(color=plot_font_color),
             xaxis=dict(showticklabels=False, showgrid=False, zeroline=False),
-            yaxis=dict(range=[0, 105], gridcolor="rgba(255,255,255,0.05)", zeroline=False),
+            yaxis=dict(range=[0, 105], gridcolor=plot_grid, zeroline=False),
             margin=dict(l=20, r=20, t=20, b=20),
             height=300,
         )
@@ -156,15 +179,15 @@ with chart2:
             x=module_names,
             y=times,
             marker_color=colors,
-            text=[f"{t}m" for t in times],
+            text=[f"{t_val}m" for t_val in times],
             textposition="outside",
         ))
         fig.update_layout(
-            plot_bgcolor="rgba(0,0,0,0)",
-            paper_bgcolor="rgba(0,0,0,0)",
-            font=dict(color="#94a3b8"),
-            xaxis=dict(gridcolor="rgba(255,255,255,0.05)"),
-            yaxis=dict(gridcolor="rgba(255,255,255,0.05)", zeroline=False),
+            plot_bgcolor=plot_bg,
+            paper_bgcolor=plot_bg,
+            font=dict(color=plot_font_color),
+            xaxis=dict(gridcolor=plot_grid),
+            yaxis=dict(gridcolor=plot_grid, zeroline=False),
             margin=dict(l=20, r=20, t=20, b=20),
             height=300,
         )
@@ -194,10 +217,10 @@ for row_start in range(0, len(modules), cols_per_row):
         with col:
             st.markdown(
                 f"""<div style='text-align: center; padding: 0.8rem;
-                background: rgba(30,30,70,0.6); border: 1px solid {status_color}30;
+                background: {bg_card}; border: 1px solid {status_color}30;
                 border-radius: 12px;'>
                 <div style='font-size: 1.5rem;'>{m['icon']}</div>
-                <div style='font-weight: 600; color: #e2e8f0; font-size: 0.85rem;'>Day {m['day']}</div>
+                <div style='font-weight: 600; color: {text_primary}; font-size: 0.85rem;'>Day {m['day']}</div>
                 <div style='color: {status_color}; font-size: 0.75rem;'>{status_icon} {status.replace('_', ' ').title()}</div>
                 </div>""",
                 unsafe_allow_html=True,
@@ -211,19 +234,19 @@ st.markdown("### 🔥 Weakness Areas")
 
 if weaknesses:
     for w in weaknesses[:10]:
-        score = w.get("weakness_score", 0.5)
-        bar_width = int(score * 100)
-        bar_color = "#f43f5e" if score < 0.4 else "#f59e0b" if score < 0.7 else "#10b981"
+        w_score = w.get("weakness_score", 0.5)
+        bar_width = int(w_score * 100)
+        bar_color = "#f43f5e" if w_score < 0.4 else "#f59e0b" if w_score < 0.7 else "#10b981"
 
         st.markdown(
-            f"""<div style='background: rgba(30,30,70,0.6); border-radius: 8px; padding: 0.6rem 1rem;
-            margin: 0.3rem 0; border: 1px solid rgba(255,255,255,0.05);'>
+            f"""<div style='background: {bg_card}; border-radius: 8px; padding: 0.6rem 1rem;
+            margin: 0.3rem 0; border: 1px solid {border_color};'>
             <div style='display: flex; justify-content: space-between; align-items: center;'>
-                <span style='color: #e2e8f0; font-weight: 500;'>{w.get('topic', 'Unknown')}</span>
+                <span style='color: {text_primary}; font-weight: 500;'>{w.get('topic', 'Unknown')}</span>
                 <span style='color: {bar_color}; font-weight: 700; font-size: 0.85rem;'>
-                    {'Weak' if score < 0.4 else 'Needs Work' if score < 0.7 else 'Strong'}</span>
+                    {'Weak' if w_score < 0.4 else 'Needs Work' if w_score < 0.7 else 'Strong'}</span>
             </div>
-            <div style='background: rgba(255,255,255,0.05); border-radius: 4px; margin-top: 0.4rem; height: 6px;'>
+            <div style='background: {border_color}; border-radius: 4px; margin-top: 0.4rem; height: 6px;'>
                 <div style='background: {bar_color}; width: {bar_width}%; height: 100%; border-radius: 4px;'></div>
             </div></div>""",
             unsafe_allow_html=True,

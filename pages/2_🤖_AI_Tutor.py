@@ -21,6 +21,33 @@ if os.path.exists(css_path):
     with open(css_path, encoding="utf-8") as f:
         st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 
+# Theme support
+if "theme" not in st.session_state:
+    st.session_state.theme = "dark"
+is_light = st.session_state.theme == "light"
+text_primary = "#1e293b" if is_light else "#e2e8f0"
+text_secondary = "#475569" if is_light else "#94a3b8"
+text_muted = "#94a3b8" if is_light else "#64748b"
+bg_card = "rgba(255,255,255,0.85)" if is_light else "rgba(30,30,70,0.6)"
+border_color = "rgba(0,0,0,0.08)" if is_light else "rgba(255,255,255,0.1)"
+accent_card_bg = "rgba(37,99,235,0.06)" if is_light else "rgba(37,99,235,0.12)"
+accent_cyan_bg = "rgba(8,145,178,0.06)" if is_light else "rgba(6,182,212,0.12)"
+
+if is_light:
+    st.markdown("""<style>
+    [data-testid="stAppViewContainer"] { background: #f8fafc !important; }
+    [data-testid="stSidebar"] { background: linear-gradient(180deg, #f1f5f9 0%, #e2e8f0 100%) !important; border-right: 1px solid rgba(0,0,0,0.08) !important; }
+    .stMarkdown h1, .stMarkdown h2, .stMarkdown h3 { color: #1e293b !important; }
+    .stMarkdown p, .stCaption p { color: #475569 !important; }
+    [data-testid="stChatInput"] textarea { background: #f1f5f9 !important; border: 1px solid rgba(0,0,0,0.08) !important; color: #1e293b !important; }
+    [data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-assistant"]) .stMarkdown {
+        background: #ffffff !important; border: 1px solid rgba(0,0,0,0.08) !important; color: #1e293b !important;
+    }
+    [data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-assistant"]) .stMarkdown p,
+    [data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-assistant"]) .stMarkdown li,
+    [data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-assistant"]) .stMarkdown span { color: #1e293b !important; }
+    </style>""", unsafe_allow_html=True)
+
 # Session state
 if "chat_messages" not in st.session_state:
     st.session_state.chat_messages = {}
@@ -107,13 +134,13 @@ with st.sidebar:
 current_module = get_module(module_id)
 if current_module:
     st.markdown(
-        f"""<div style='background: linear-gradient(135deg, rgba(37,99,235,0.12), rgba(6,182,212,0.12));
+        f"""<div style='background: linear-gradient(135deg, {accent_card_bg}, {accent_cyan_bg});
         border: 1px solid rgba(37,99,235,0.25); border-radius: 12px; padding: 1rem 1.2rem;
         margin-bottom: 1rem;'>
         <span style='font-size: 1.2rem;'>{current_module['icon']}</span>
-        <span style='font-weight: 700; color: #e2e8f0;'> Day {current_module['day']}:</span>
-        <span style='color: #94a3b8;'> {current_module['title']}</span>
-        <span style='float: right; color: #64748b; font-size: 0.85rem;'>📊 {current_module['weight']} of exam</span>
+        <span style='font-weight: 700; color: {text_primary};'> Day {current_module['day']}:</span>
+        <span style='color: {text_secondary};'> {current_module['title']}</span>
+        <span style='float: right; color: {text_muted}; font-size: 0.85rem;'>📊 {current_module['weight']} of exam</span>
         </div>""",
         unsafe_allow_html=True,
     )

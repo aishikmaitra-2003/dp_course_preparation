@@ -30,6 +30,70 @@ if os.path.exists(css_path):
         st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 
 # ---------------------------------------------------------------------------
+# Theme state
+# ---------------------------------------------------------------------------
+if "theme" not in st.session_state:
+    st.session_state.theme = "dark"
+
+
+def get_theme_colors():
+    """Return color variables based on current theme."""
+    is_light = st.session_state.theme == "light"
+    return {
+        "text_primary": "#1e293b" if is_light else "#e2e8f0",
+        "text_secondary": "#475569" if is_light else "#94a3b8",
+        "text_muted": "#94a3b8" if is_light else "#64748b",
+        "bg_card": "rgba(255,255,255,0.85)" if is_light else "rgba(30,30,70,0.6)",
+        "border": "rgba(0,0,0,0.08)" if is_light else "rgba(255,255,255,0.1)",
+        "bg_page": "#f8fafc" if is_light else "#0f0f23",
+        "bg_sidebar": "linear-gradient(180deg, #f1f5f9 0%, #e2e8f0 100%)" if is_light else "linear-gradient(180deg, #12122e 0%, #0f0f23 100%)",
+        "border_sidebar": "rgba(0,0,0,0.08)" if is_light else "rgba(255,255,255,0.1)",
+        "accent_card_bg": "rgba(37,99,235,0.06)" if is_light else "rgba(37,99,235,0.15)",
+        "accent_cyan_bg": "rgba(8,145,178,0.06)" if is_light else "rgba(6,182,212,0.15)",
+        "accent_green_bg": "rgba(5,150,105,0.06)" if is_light else "rgba(16,185,129,0.15)",
+        "accent_amber_bg": "rgba(217,119,6,0.06)" if is_light else "rgba(245,158,11,0.15)",
+        "accent_rose_bg": "rgba(225,29,72,0.06)" if is_light else "rgba(244,63,94,0.15)",
+    }
+
+
+def inject_theme_css():
+    """Inject CSS to override Streamlit's base theme based on toggle."""
+    is_light = st.session_state.theme == "light"
+    if is_light:
+        st.markdown("""<style>
+        [data-testid="stAppViewContainer"] { background: #f8fafc !important; }
+        [data-testid="stSidebar"] { background: linear-gradient(180deg, #f1f5f9 0%, #e2e8f0 100%) !important; border-right: 1px solid rgba(0,0,0,0.08) !important; }
+        [data-testid="stSidebar"] .stMarkdown h1,
+        [data-testid="stSidebar"] .stMarkdown h3 { color: #1e293b !important; -webkit-text-fill-color: #1e293b !important; background: none !important; }
+        [data-testid="stSidebar"] .stMarkdown p,
+        [data-testid="stSidebar"] .stCaption p { color: #475569 !important; }
+        .stMarkdown h1, .stMarkdown h2, .stMarkdown h3 { color: #1e293b !important; }
+        .stMarkdown p, .stCaption p { color: #475569 !important; }
+        [data-testid="stMetric"] { background: rgba(255,255,255,0.85) !important; border: 1px solid rgba(0,0,0,0.08) !important; }
+        [data-testid="stMetricLabel"] { color: #475569 !important; }
+        [data-testid="stExpander"] { background: rgba(255,255,255,0.85) !important; border: 1px solid rgba(0,0,0,0.08) !important; }
+        [data-testid="stChatInput"] textarea { background: #f1f5f9 !important; border: 1px solid rgba(0,0,0,0.08) !important; color: #1e293b !important; }
+        .stTextInput input, .stTextArea textarea { background: #f1f5f9 !important; border: 1px solid rgba(0,0,0,0.08) !important; color: #1e293b !important; }
+        .stTabs [data-baseweb="tab-list"] { background: #f1f5f9 !important; }
+        .stTabs [data-baseweb="tab"] { color: #475569 !important; }
+        .stProgress > div { background: #e2e8f0 !important; }
+        .stRadio label, .stCheckbox label { color: #1e293b !important; }
+        pre { background: #f1f5f9 !important; border: 1px solid rgba(0,0,0,0.08) !important; }
+        hr { border-color: rgba(0,0,0,0.08) !important; }
+        ::-webkit-scrollbar-track { background: #f1f5f9 !important; }
+        [data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-assistant"]) .stMarkdown {
+            background: #ffffff !important; border: 1px solid rgba(0,0,0,0.08) !important; color: #1e293b !important;
+        }
+        [data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-assistant"]) .stMarkdown p,
+        [data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-assistant"]) .stMarkdown li,
+        [data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-assistant"]) .stMarkdown span { color: #1e293b !important; }
+        </style>""", unsafe_allow_html=True)
+
+
+inject_theme_css()
+t = get_theme_colors()
+
+# ---------------------------------------------------------------------------
 # Start Flask backend
 # ---------------------------------------------------------------------------
 from backend.server import start_flask_server, get_api_url
@@ -55,6 +119,14 @@ with st.sidebar:
 
     st.divider()
 
+    # Theme toggle
+    theme_label = "🌙 Dark Mode" if st.session_state.theme == "dark" else "☀️ Light Mode"
+    if st.button(theme_label, key="theme_toggle", use_container_width=True):
+        st.session_state.theme = "light" if st.session_state.theme == "dark" else "dark"
+        st.rerun()
+
+    st.divider()
+
     # API Status
     try:
         health = requests.get(f"{API_URL}/api/health", timeout=3).json()
@@ -76,7 +148,7 @@ with st.sidebar:
 
     st.divider()
     st.markdown(
-        "<p style='text-align:center; color:#64748b; font-size:0.75rem;'>"
+        f"<p style='text-align:center; color:{t['text_muted']}; font-size:0.75rem;'>"
         "Built with 💜 by FabricPrep AI</p>",
         unsafe_allow_html=True,
     )
@@ -85,13 +157,13 @@ with st.sidebar:
 # Main Dashboard
 # ---------------------------------------------------------------------------
 st.markdown(
-    """
+    f"""
     <h1 style='text-align:center;'>
         <span style='background: linear-gradient(135deg, #2563eb 0%, #06b6d4 100%);
         -webkit-background-clip: text; -webkit-text-fill-color: transparent;
         font-weight: 800;'>🚀 FabricPrep</span>
     </h1>
-    <p style='text-align:center; color:#94a3b8; font-size:1.1rem; margin-top:-10px;'>
+    <p style='text-align:center; color:{t["text_secondary"]}; font-size:1.1rem; margin-top:-10px;'>
         Your AI-powered study buddy for the Microsoft DP-700 certification 🔥
     </p>
     """,
@@ -138,11 +210,11 @@ qa1, qa2, qa3, qa4 = st.columns(4)
 
 with qa1:
     st.markdown(
-        """<div style='background: linear-gradient(135deg, rgba(37,99,235,0.15), rgba(6,182,212,0.15));
+        f"""<div style='background: linear-gradient(135deg, {t["accent_card_bg"]}, {t["accent_cyan_bg"]});
         border: 1px solid rgba(37,99,235,0.3); border-radius: 16px; padding: 1.5rem; text-align: center;'>
         <div style='font-size: 2.5rem;'>🤖</div>
-        <div style='font-weight: 700; margin-top: 0.5rem; color: #e2e8f0;'>AI Tutor</div>
-        <div style='color: #94a3b8; font-size: 0.85rem;'>Chat with DP_Bot</div>
+        <div style='font-weight: 700; margin-top: 0.5rem; color: {t["text_primary"]};'>AI Tutor</div>
+        <div style='color: {t["text_secondary"]}; font-size: 0.85rem;'>Chat with DP_Bot</div>
         </div>""",
         unsafe_allow_html=True,
     )
@@ -151,11 +223,11 @@ with qa1:
 
 with qa2:
     st.markdown(
-        """<div style='background: linear-gradient(135deg, rgba(16,185,129,0.15), rgba(6,182,212,0.15));
+        f"""<div style='background: linear-gradient(135deg, {t["accent_green_bg"]}, {t["accent_cyan_bg"]});
         border: 1px solid rgba(16,185,129,0.3); border-radius: 16px; padding: 1.5rem; text-align: center;'>
         <div style='font-size: 2.5rem;'>🎙️</div>
-        <div style='font-weight: 700; margin-top: 0.5rem; color: #e2e8f0;'>Voice Bot</div>
-        <div style='color: #94a3b8; font-size: 0.85rem;'>Talk & learn out loud</div>
+        <div style='font-weight: 700; margin-top: 0.5rem; color: {t["text_primary"]};'>Voice Bot</div>
+        <div style='color: {t["text_secondary"]}; font-size: 0.85rem;'>Talk & learn out loud</div>
         </div>""",
         unsafe_allow_html=True,
     )
@@ -164,11 +236,11 @@ with qa2:
 
 with qa3:
     st.markdown(
-        """<div style='background: linear-gradient(135deg, rgba(245,158,11,0.15), rgba(244,63,94,0.15));
+        f"""<div style='background: linear-gradient(135deg, {t["accent_amber_bg"]}, {t["accent_rose_bg"]});
         border: 1px solid rgba(245,158,11,0.3); border-radius: 16px; padding: 1.5rem; text-align: center;'>
         <div style='font-size: 2.5rem;'>🧪</div>
-        <div style='font-weight: 700; margin-top: 0.5rem; color: #e2e8f0;'>Take Quiz</div>
-        <div style='color: #94a3b8; font-size: 0.85rem;'>Test your knowledge</div>
+        <div style='font-weight: 700; margin-top: 0.5rem; color: {t["text_primary"]};'>Take Quiz</div>
+        <div style='color: {t["text_secondary"]}; font-size: 0.85rem;'>Test your knowledge</div>
         </div>""",
         unsafe_allow_html=True,
     )
@@ -177,11 +249,11 @@ with qa3:
 
 with qa4:
     st.markdown(
-        """<div style='background: linear-gradient(135deg, rgba(244,63,94,0.15), rgba(37,99,235,0.15));
+        f"""<div style='background: linear-gradient(135deg, {t["accent_rose_bg"]}, {t["accent_card_bg"]});
         border: 1px solid rgba(244,63,94,0.3); border-radius: 16px; padding: 1.5rem; text-align: center;'>
         <div style='font-size: 2.5rem;'>📝</div>
-        <div style='font-weight: 700; margin-top: 0.5rem; color: #e2e8f0;'>Journal</div>
-        <div style='color: #94a3b8; font-size: 0.85rem;'>Make study notes</div>
+        <div style='font-weight: 700; margin-top: 0.5rem; color: {t["text_primary"]};'>Journal</div>
+        <div style='color: {t["text_secondary"]}; font-size: 0.85rem;'>Make study notes</div>
         </div>""",
         unsafe_allow_html=True,
     )
@@ -218,25 +290,25 @@ for i in range(0, len(modules), 2):
 
         status_icon = {"not_started": "⬜", "in_progress": "🟡", "completed": "✅"}.get(status, "⬜")
         status_label = {"not_started": "Not Started", "in_progress": "In Progress", "completed": "Completed"}.get(status, "Not Started")
-        status_color = {"not_started": "#64748b", "in_progress": "#f59e0b", "completed": "#10b981"}.get(status, "#64748b")
+        status_color = {"not_started": t["text_muted"], "in_progress": "#f59e0b", "completed": "#10b981"}.get(status, t["text_muted"])
 
         with col:
             st.markdown(
-                f"""<div style='background: rgba(30,30,70,0.6); border: 1px solid rgba(255,255,255,0.1);
+                f"""<div style='background: {t["bg_card"]}; border: 1px solid {t["border"]};
                 border-radius: 16px; padding: 1.2rem; margin-bottom: 0.5rem;
                 backdrop-filter: blur(12px);'>
                 <div style='display: flex; justify-content: space-between; align-items: center;'>
                     <div>
                         <span style='font-size: 1.3rem;'>{m['icon']}</span>
-                        <span style='font-weight: 700; color: #e2e8f0; margin-left: 0.5rem;'>Day {m['day']}</span>
-                        <span style='color: #94a3b8; margin-left: 0.3rem;'>— {m['title']}</span>
+                        <span style='font-weight: 700; color: {t["text_primary"]}; margin-left: 0.5rem;'>Day {m['day']}</span>
+                        <span style='color: {t["text_secondary"]}; margin-left: 0.3rem;'>— {m['title']}</span>
                     </div>
                     <div style='display: flex; align-items: center; gap: 8px;'>
                         <span style='color: {status_color}; font-size: 0.8rem; font-weight: 600;'>{status_icon} {status_label}</span>
-                        <span style='color: #64748b; font-size: 0.75rem;'>({time_spent}m)</span>
+                        <span style='color: {t["text_muted"]}; font-size: 0.75rem;'>({time_spent}m)</span>
                     </div>
                 </div>
-                <div style='color: #64748b; font-size: 0.8rem; margin-top: 0.3rem;'>{m['weight']} of exam</div>
+                <div style='color: {t["text_muted"]}; font-size: 0.8rem; margin-top: 0.3rem;'>{m['weight']} of exam</div>
                 </div>""",
                 unsafe_allow_html=True,
             )
@@ -247,13 +319,13 @@ st.markdown("")
 # Motivational footer
 # ---------------------------------------------------------------------------
 st.markdown(
-    """<div style='text-align: center; padding: 2rem; margin-top: 1rem;
-    background: linear-gradient(135deg, rgba(37,99,235,0.08), rgba(6,182,212,0.08));
-    border-radius: 16px; border: 1px solid rgba(255,255,255,0.05);'>
-    <div style='font-size: 1.5rem; font-weight: 800; color: #e2e8f0;'>
+    f"""<div style='text-align: center; padding: 2rem; margin-top: 1rem;
+    background: linear-gradient(135deg, {t["accent_card_bg"]}, {t["accent_cyan_bg"]});
+    border-radius: 16px; border: 1px solid {t["border"]};'>
+    <div style='font-size: 1.5rem; font-weight: 800; color: {t["text_primary"]};'>
         "Bachcho, certification crack karna hai toh LET'S GOOO! 🔥"
     </div>
-    <div style='color: #94a3b8; margin-top: 0.5rem;'>— DP_Bot AI (your hype tutor)</div>
+    <div style='color: {t["text_secondary"]}; margin-top: 0.5rem;'>— DP_Bot AI (your hype tutor)</div>
     </div>""",
     unsafe_allow_html=True,
 )
