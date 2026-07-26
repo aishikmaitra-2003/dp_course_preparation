@@ -33,6 +33,8 @@ border_color = "rgba(0,0,0,0.08)" if is_light else "rgba(255,255,255,0.1)"
 if is_light:
     st.markdown("""<style>
     [data-testid="stAppViewContainer"] { background: #f8fafc !important; }
+    [data-testid="stHeader"] { background: #f8fafc !important; }
+    [data-testid="stBottomBlockContainer"], [data-testid="stBottom"] { background: #f8fafc !important; }
     [data-testid="stSidebar"] { background: linear-gradient(180deg, #f1f5f9 0%, #e2e8f0 100%) !important; }
     .stMarkdown h1, .stMarkdown h2, .stMarkdown h3 { color: #1e293b !important; }
     .stMarkdown p, .stCaption p { color: #475569 !important; }

@@ -74,6 +74,11 @@
 /* ---------- Global Styles ---------- */
 html, body, [data-testid="stAppViewContainer"] {
     font-family: 'Inter', -apple-system, sans-serif !important;
+    color: var(--text-primary) !important;
+}
+
+[data-testid="stSidebarNav"] * {
+    color: var(--text-primary) !important;
 }
 
 [data-testid="stAppViewContainer"] {
