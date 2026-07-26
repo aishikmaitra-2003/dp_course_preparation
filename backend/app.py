@@ -202,13 +202,15 @@ Generate exactly {num_questions} MCQ questions. Return ONLY a JSON array."""
         if not text:
             return jsonify({"error": "Text is required"}), 400
 
-        audio_bytes = text_to_speech(text)
+        result = text_to_speech(text)
+        audio_bytes, mime_type = result if isinstance(result, tuple) else (result, "audio/mp3")
         if audio_bytes:
+            ext = "wav" if "wav" in mime_type else "mp3"
             return send_file(
                 io.BytesIO(audio_bytes),
-                mimetype="audio/mp3",
+                mimetype=mime_type,
                 as_attachment=False,
-                download_name="response.mp3",
+                download_name=f"response.{ext}",
             )
         return jsonify({"error": "TTS failed"}), 500
 

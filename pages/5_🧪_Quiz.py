@@ -23,6 +23,28 @@ if os.path.exists(css_path):
     with open(css_path, encoding="utf-8") as f:
         st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 
+# Theme support
+if "theme" not in st.session_state:
+    st.session_state.theme = "dark"
+is_light = st.session_state.theme == "light"
+text_primary = "#1e293b" if is_light else "#e2e8f0"
+text_secondary = "#475569" if is_light else "#94a3b8"
+text_muted = "#94a3b8" if is_light else "#64748b"
+bg_card = "rgba(255,255,255,0.85)" if is_light else "rgba(30,30,70,0.6)"
+border_color = "rgba(0,0,0,0.08)" if is_light else "rgba(255,255,255,0.1)"
+
+if is_light:
+    st.markdown("""<style>
+    [data-testid="stAppViewContainer"] { background: #f8fafc !important; }
+    [data-testid="stSidebar"] { background: linear-gradient(180deg, #f1f5f9 0%, #e2e8f0 100%) !important; }
+    .stMarkdown h1, .stMarkdown h2, .stMarkdown h3 { color: #1e293b !important; }
+    .stMarkdown p, .stCaption p { color: #475569 !important; }
+    .stTabs [data-baseweb="tab-list"] { background: #f1f5f9 !important; }
+    .stTabs [data-baseweb="tab"] { color: #475569 !important; }
+    .stRadio label { color: #1e293b !important; }
+    [data-testid="stExpander"] { background: rgba(255,255,255,0.85) !important; border: 1px solid rgba(0,0,0,0.08) !important; }
+    </style>""", unsafe_allow_html=True)
+
 if "current_module" not in st.session_state:
     st.session_state.current_module = 1
 if "quiz_state" not in st.session_state:
@@ -116,10 +138,10 @@ if st.session_state.quiz_state == "setup":
     with tab_final:
         st.markdown("### 🏆 Final Mock Exam")
         st.markdown(
-            """<div style='background: linear-gradient(135deg, rgba(245,158,11,0.1), rgba(244,63,94,0.1));
+            f"""<div style='background: linear-gradient(135deg, rgba(245,158,11,0.1), rgba(244,63,94,0.1));
             border: 1px solid rgba(245,158,11,0.3); border-radius: 12px; padding: 1.2rem;'>
             <strong style='color: #f59e0b;'>⚠️ This is the real deal!</strong>
-            <p style='color: #94a3b8; margin-top: 0.5rem;'>
+            <p style='color: {text_secondary}; margin-top: 0.5rem;'>
             60 questions covering ALL modules. Timed at 90 minutes.<br>
             This simulates the actual DP-700 exam experience. Take it when you've completed all 9 study modules!
             </p></div>""",
@@ -175,7 +197,7 @@ elif st.session_state.quiz_state == "active":
             f"""<div style='text-align: right; padding: 0.5rem;'>
             <span style='color: {timer_color}; font-weight: 700; font-size: 1.2rem;'>
             ⏱️ {mins:02d}:{secs:02d}</span>
-            <span style='color: #64748b;'> remaining</span></div>""",
+            <span style='color: {text_muted};'> remaining</span></div>""",
             unsafe_allow_html=True,
         )
 
@@ -194,15 +216,15 @@ elif st.session_state.quiz_state == "active":
         }.get(q.get("difficulty", "medium"), ("🟡", "rgba(245,158,11,0.15)", "#f59e0b"))
 
         st.markdown(
-            f"""<div style='background: rgba(30,30,70,0.6); border: 1px solid rgba(255,255,255,0.1);
+            f"""<div style='background: {bg_card}; border: 1px solid {border_color};
             border-radius: 12px; padding: 1.2rem; margin: 0.8rem 0;'>
             <div style='display: flex; justify-content: space-between;'>
-                <span style='font-weight: 700; color: #e2e8f0;'>Q{i+1}.</span>
+                <span style='font-weight: 700; color: {text_primary};'>Q{i+1}.</span>
                 <span style='background: {difficulty_badge[1]}; color: {difficulty_badge[2]};
                 padding: 2px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: 600;'>
                 {difficulty_badge[0]} {q.get('difficulty', 'medium').upper()}</span>
             </div>
-            <div style='color: #e2e8f0; margin-top: 0.5rem;'>{q.get('question', '')}</div>
+            <div style='color: {text_primary}; margin-top: 0.5rem;'>{q.get('question', '')}</div>
             </div>""",
             unsafe_allow_html=True,
         )
@@ -284,8 +306,8 @@ elif st.session_state.quiz_state == "results":
         border: 2px solid {grade_color}40; border-radius: 20px;'>
         <div style='font-size: 3rem;'>{grade_emoji}</div>
         <div style='font-size: 3rem; font-weight: 800; color: {grade_color};'>{pct}%</div>
-        <div style='font-size: 1.2rem; color: #e2e8f0; margin-top: 0.5rem;'>{score}/{total} correct</div>
-        <div style='color: #94a3b8; margin-top: 0.5rem;'>{grade_msg}</div>
+        <div style='font-size: 1.2rem; color: {text_primary}; margin-top: 0.5rem;'>{score}/{total} correct</div>
+        <div style='color: {text_secondary}; margin-top: 0.5rem;'>{grade_msg}</div>
         </div>""",
         unsafe_allow_html=True,
     )
@@ -296,15 +318,15 @@ elif st.session_state.quiz_state == "results":
     if wrong_topics:
         st.markdown("### ⚠️ Areas to Improve")
         topic_counts = {}
-        for t in wrong_topics:
-            topic_counts[t] = topic_counts.get(t, 0) + 1
+        for t_topic in wrong_topics:
+            topic_counts[t_topic] = topic_counts.get(t_topic, 0) + 1
 
         for topic, count in sorted(topic_counts.items(), key=lambda x: -x[1]):
             st.markdown(
                 f"""<div style='background: rgba(244,63,94,0.1); border: 1px solid rgba(244,63,94,0.2);
                 border-radius: 8px; padding: 0.5rem 1rem; margin: 0.3rem 0;'>
                 <span style='color: #f43f5e; font-weight: 600;'>❌ {topic}</span>
-                <span style='color: #64748b; float: right;'>{count} wrong</span></div>""",
+                <span style='color: {text_muted}; float: right;'>{count} wrong</span></div>""",
                 unsafe_allow_html=True,
             )
 
@@ -318,7 +340,6 @@ elif st.session_state.quiz_state == "results":
         is_correct = user_ans == correct_ans
 
         icon = "✅" if is_correct else "❌"
-        border_color = "rgba(16,185,129,0.3)" if is_correct else "rgba(244,63,94,0.3)"
 
         with st.expander(f"{icon} Q{i+1}: {q.get('question', '')[:80]}..."):
             st.markdown(f"**Question:** {q.get('question', '')}")

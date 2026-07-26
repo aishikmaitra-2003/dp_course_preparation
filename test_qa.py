@@ -1,6 +1,9 @@
 import os
 import sys
 
+# Fix Windows console encoding for emoji output
+sys.stdout.reconfigure(encoding='utf-8', errors='replace')
+
 # Ensure project root is in path
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
@@ -41,8 +44,12 @@ def run_qa():
     
     # 5. Voice TTS
     print("Testing TTS...")
-    audio_bytes = text_to_speech("Hello from Fabric Prep")
-    print(f"TTS generated {len(audio_bytes) if audio_bytes else 0} bytes of audio.")
+    tts_result = text_to_speech("Hello from Fabric Prep")
+    if isinstance(tts_result, tuple):
+        audio_bytes, mime_type = tts_result
+        print(f"TTS generated {len(audio_bytes) if audio_bytes else 0} bytes of audio ({mime_type}).")
+    else:
+        print(f"TTS generated {len(tts_result) if tts_result else 0} bytes of audio.")
     
     # STT requires an audio file, skipping STT direct test as it needs a WAV file.
     

@@ -21,6 +21,26 @@ if os.path.exists(css_path):
     with open(css_path, encoding="utf-8") as f:
         st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 
+# Theme support
+if "theme" not in st.session_state:
+    st.session_state.theme = "dark"
+is_light = st.session_state.theme == "light"
+text_primary = "#1e293b" if is_light else "#e2e8f0"
+text_secondary = "#475569" if is_light else "#94a3b8"
+text_muted = "#94a3b8" if is_light else "#64748b"
+
+if is_light:
+    st.markdown("""<style>
+    [data-testid="stAppViewContainer"] { background: #f8fafc !important; }
+    [data-testid="stSidebar"] { background: linear-gradient(180deg, #f1f5f9 0%, #e2e8f0 100%) !important; border-right: 1px solid rgba(0,0,0,0.08) !important; }
+    .stMarkdown h1, .stMarkdown h2, .stMarkdown h3 { color: #1e293b !important; }
+    .stMarkdown p, .stCaption p { color: #475569 !important; }
+    [data-testid="stExpander"] { background: rgba(255,255,255,0.85) !important; border: 1px solid rgba(0,0,0,0.08) !important; }
+    .stTextInput input, .stTextArea textarea { background: #f1f5f9 !important; border: 1px solid rgba(0,0,0,0.08) !important; color: #1e293b !important; }
+    .stTabs [data-baseweb="tab-list"] { background: #f1f5f9 !important; }
+    .stTabs [data-baseweb="tab"] { color: #475569 !important; }
+    </style>""", unsafe_allow_html=True)
+
 if "current_module" not in st.session_state:
     st.session_state.current_module = 1
 
@@ -142,7 +162,7 @@ with tab_view:
 
     if not entries:
         st.markdown(
-            """<div style='text-align: center; padding: 3rem; color: #64748b;'>
+            f"""<div style='text-align: center; padding: 3rem; color: {text_muted};'>
             <div style='font-size: 3rem;'>📝</div>
             <div style='font-size: 1.2rem; margin-top: 1rem;'>No notes yet!</div>
             <div>Switch to the <strong>✏️ New Note</strong> tab to start writing.</div>

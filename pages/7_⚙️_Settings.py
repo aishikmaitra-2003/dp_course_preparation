@@ -20,6 +20,25 @@ if os.path.exists(css_path):
     with open(css_path, encoding="utf-8") as f:
         st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 
+# Theme support
+if "theme" not in st.session_state:
+    st.session_state.theme = "dark"
+is_light = st.session_state.theme == "light"
+text_primary = "#1e293b" if is_light else "#e2e8f0"
+text_secondary = "#475569" if is_light else "#94a3b8"
+text_muted = "#94a3b8" if is_light else "#64748b"
+bg_card = "rgba(255,255,255,0.85)" if is_light else "rgba(30,30,70,0.6)"
+border_color = "rgba(0,0,0,0.08)" if is_light else "rgba(255,255,255,0.1)"
+
+if is_light:
+    st.markdown("""<style>
+    [data-testid="stAppViewContainer"] { background: #f8fafc !important; }
+    [data-testid="stSidebar"] { background: linear-gradient(180deg, #f1f5f9 0%, #e2e8f0 100%) !important; }
+    .stMarkdown h1, .stMarkdown h2, .stMarkdown h3 { color: #1e293b !important; }
+    .stMarkdown p, .stCaption p { color: #475569 !important; }
+    .stTextInput input { background: #f1f5f9 !important; border: 1px solid rgba(0,0,0,0.08) !important; color: #1e293b !important; }
+    </style>""", unsafe_allow_html=True)
+
 st.markdown(
     """<h1 style='background: linear-gradient(135deg, #2563eb, #06b6d4);
     -webkit-background-clip: text; -webkit-text-fill-color: transparent;
@@ -33,10 +52,10 @@ st.markdown('<div class="header-line"></div>', unsafe_allow_html=True)
 # ---------------------------------------------------------------------------
 st.markdown("### 🔑 API Keys")
 st.markdown(
-    """<div style='background: rgba(245,158,11,0.1); border: 1px solid rgba(245,158,11,0.3);
+    f"""<div style='background: rgba(245,158,11,0.1); border: 1px solid rgba(245,158,11,0.3);
     border-radius: 12px; padding: 1rem; margin-bottom: 1rem;'>
     <strong style='color: #f59e0b;'>💡 How to get API keys (both are FREE!):</strong>
-    <ul style='color: #94a3b8; margin-top: 0.5rem;'>
+    <ul style='color: {text_secondary}; margin-top: 0.5rem;'>
         <li><strong>Gemini</strong>: Go to <a href='https://aistudio.google.com/apikey' target='_blank' style='color: #06b6d4;'>Google AI Studio</a> → Create API Key</li>
         <li><strong>Groq</strong>: Go to <a href='https://console.groq.com/keys' target='_blank' style='color: #06b6d4;'>Groq Console</a> → Create API Key</li>
     </ul></div>""",
@@ -79,7 +98,7 @@ with col2:
             st.rerun()
 
 st.markdown(
-    """<div style='color: #64748b; font-size: 0.8rem; margin-top: 0.5rem;'>
+    f"""<div style='color: {text_muted}; font-size: 0.8rem; margin-top: 0.5rem;'>
     <strong>For Streamlit Cloud deployment</strong>, add these keys in
     <code>.streamlit/secrets.toml</code> or via the Streamlit Cloud dashboard under
     "Secrets":<br>
@@ -116,17 +135,17 @@ model_info = {
 for key, info in model_info.items():
     status = "✅ Available" if key_status.get(key) else "❌ Key Missing"
     st.markdown(
-        f"""<div style='background: rgba(30,30,70,0.6); border: 1px solid rgba(255,255,255,0.1);
+        f"""<div style='background: {bg_card}; border: 1px solid {border_color};
         border-radius: 12px; padding: 1rem; margin: 0.5rem 0;'>
         <div style='display: flex; justify-content: space-between; align-items: center;'>
             <div>
                 <span style='font-size: 1.3rem;'>{info['icon']}</span>
-                <span style='font-weight: 700; color: #e2e8f0; margin-left: 0.5rem;'>{info['name']}</span>
-                <span style='color: #64748b; margin-left: 0.5rem;'>({info['provider']})</span>
+                <span style='font-weight: 700; color: {text_primary}; margin-left: 0.5rem;'>{info['name']}</span>
+                <span style='color: {text_muted}; margin-left: 0.5rem;'>({info['provider']})</span>
             </div>
             <span style='color: {"#10b981" if key_status.get(key) else "#f43f5e"}; font-size: 0.85rem;'>{status}</span>
         </div>
-        <div style='color: #94a3b8; font-size: 0.85rem; margin-top: 0.3rem;'>
+        <div style='color: {text_secondary}; font-size: 0.85rem; margin-top: 0.3rem;'>
             ⚡ {info['speed']} • 🎯 Best for: {info['best_for']}
         </div></div>""",
         unsafe_allow_html=True,
@@ -221,8 +240,8 @@ st.divider()
 
 # App info
 st.markdown(
-    """<div style='text-align: center; color: #64748b; font-size: 0.85rem; padding: 1rem;'>
-    <strong>FabricPrep v1.0</strong> — DP-700 Exam Prep App<br>
+    f"""<div style='text-align: center; color: {text_muted}; font-size: 0.85rem; padding: 1rem;'>
+    <strong>FabricPrep v1.1</strong> — DP-700 Exam Prep App<br>
     Built with Streamlit • Flask • LiteLLM • Gemini • Groq<br>
     Made with 💜 for aspiring Fabric Data Engineers
     </div>""",

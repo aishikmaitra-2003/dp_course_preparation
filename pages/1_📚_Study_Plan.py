@@ -21,6 +21,25 @@ if os.path.exists(css_path):
     with open(css_path, encoding="utf-8") as f:
         st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 
+# Theme support
+if "theme" not in st.session_state:
+    st.session_state.theme = "dark"
+is_light = st.session_state.theme == "light"
+text_primary = "#1e293b" if is_light else "#e2e8f0"
+text_secondary = "#475569" if is_light else "#94a3b8"
+text_muted = "#94a3b8" if is_light else "#64748b"
+bg_card = "rgba(255,255,255,0.85)" if is_light else "rgba(30,30,70,0.6)"
+border_color = "rgba(0,0,0,0.08)" if is_light else "rgba(255,255,255,0.1)"
+
+if is_light:
+    st.markdown("""<style>
+    [data-testid="stAppViewContainer"] { background: #f8fafc !important; }
+    [data-testid="stSidebar"] { background: linear-gradient(180deg, #f1f5f9 0%, #e2e8f0 100%) !important; border-right: 1px solid rgba(0,0,0,0.08) !important; }
+    .stMarkdown h1, .stMarkdown h2, .stMarkdown h3 { color: #1e293b !important; }
+    .stMarkdown p, .stCaption p { color: #475569 !important; }
+    [data-testid="stExpander"] { background: rgba(255,255,255,0.85) !important; border: 1px solid rgba(0,0,0,0.08) !important; }
+    </style>""", unsafe_allow_html=True)
+
 st.markdown(
     """<h1 style='background: linear-gradient(135deg, #2563eb, #06b6d4);
     -webkit-background-clip: text; -webkit-text-fill-color: transparent;
@@ -53,7 +72,7 @@ for m in modules:
     time_spent = prog.get("time_spent_mins", 0)
 
     status_cfg = {
-        "not_started": {"icon": "⬜", "label": "Not Started", "color": "#64748b", "bg": "rgba(100,116,139,0.1)"},
+        "not_started": {"icon": "⬜", "label": "Not Started", "color": text_muted, "bg": "rgba(100,116,139,0.1)"},
         "in_progress": {"icon": "🟡", "label": "In Progress", "color": "#f59e0b", "bg": "rgba(245,158,11,0.1)"},
         "completed": {"icon": "✅", "label": "Completed", "color": "#10b981", "bg": "rgba(16,185,129,0.1)"},
     }
@@ -64,8 +83,8 @@ for m in modules:
         st.markdown(f"📊 **Exam Weight:** {m['weight']}")
 
         st.markdown("#### 📖 Topics to Cover:")
-        for t in m["topics"]:
-            st.markdown(f"- {t}")
+        for t_topic in m["topics"]:
+            st.markdown(f"- {t_topic}")
 
         st.markdown("#### 🧠 Key Concepts:")
         for c in m["key_concepts"]:
